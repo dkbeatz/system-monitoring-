@@ -1,0 +1,4 @@
+com\Codico\spring_metrics\SpringMetricsApplication.class
+com\Codico\spring_metrics\controller\MetricsController.class
+com\Codico\spring_metrics\service\MetricsService.class
+com\Codico\spring_metrics\config\ActuatorConfig.class

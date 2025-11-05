@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Spring Boot Performance Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .chartBox { width: 600px; margin-bottom: 40px; }
+    </style>
+</head>
+
+<body>
+<h2>Spring Boot Real-Time Monitoring Dashboard</h2>
+<hr>
+
+<div class="chartBox">
+    <canvas id="cpuChart"></canvas>
+</div>
+
+<div class="chartBox">
+    <canvas id="memoryChart"></canvas>
+</div>
+
+<script>
+    let cpuChartCtx = document.getElementById('cpuChart').getContext('2d');
+    let memChartCtx = document.getElementById('memoryChart').getContext('2d');
+
+    let cpuChart = new Chart(cpuChartCtx, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'CPU Usage', data: [] }] }
+    });
+
+    let memChart = new Chart(memChartCtx, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Memory Usage (MB)', data: [] }] }
+    });
+
+    async function fetchMetrics(){
+        const res = await fetch("/api/metrics");
+        const data = await res.json();
+
+        let time = new Date().toLocaleTimeString();
+
+        // Update CPU chart
+        cpuChart.data.labels.push(time);
+        cpuChart.data.datasets[0].data.push(data.cpuUsage * 100);
+        cpuChart.update();
+
+        // Update Memory chart
+        let memInMB = (data.jvmMemoryUsed / 1024 / 1024).toFixed(2);
+        memChart.data.labels.push(time);
+        memChart.data.datasets[0].data.push(memInMB);
+        memChart.update();
+    }
+
+    setInterval(fetchMetrics, 2000);
+</script>
+
+</body>
+</html>
